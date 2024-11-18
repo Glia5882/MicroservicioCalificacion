@@ -26,27 +26,39 @@ public class Calificacion_service {
     }
 
     // Crear una nueva calificación
-    public Califiacion_dto crearCalificacion(Califiacion_dto calificacionDto) {
-        // Validar que las estrellas estén entre 1 y 5
-        if (calificacionDto.getEstrellas() < 1 || calificacionDto.getEstrellas() > 5) {
-            throw new IllegalArgumentException("Las estrellas deben estar entre 1 y 5.");
-        }
+// Crear una nueva calificación
+public Califiacion_dto crearCalificacion(Califiacion_dto calificacionDto) {
+    // Validar la calificación
+    validarCalificacion(calificacionDto);
 
-        // Convertir el DTO a entidad
-        Calificacion calificacion = new Calificacion();
-        calificacion.setEstrellas(calificacionDto.getEstrellas());
-        calificacion.setComentario(calificacionDto.getComentario());
+    // Convertir el DTO a entidad usando ModelMapper
+    Calificacion calificacion = modelMapper.map(calificacionDto, Calificacion.class);
 
-        // Guardar la calificación en la base de datos
-        Calificacion nuevaCalificacion = calificacion_repository.save(calificacion);
+    // Guardar la calificación en la base de datos
+    Calificacion nuevaCalificacion = calificacion_repository.save(calificacion);
 
-        // Convertir la entidad a DTO y devolverla
-        return new Califiacion_dto(nuevaCalificacion.getId_calificacion(), nuevaCalificacion.getEstrellas(), nuevaCalificacion.getComentario());
-    }
+    // Convertir la entidad guardada de vuelta a DTO y devolverla
+    return modelMapper.map(nuevaCalificacion, Califiacion_dto.class);
+}
+
 
     // Obtener todas las calificaciones
-    public List<Calificacion> obtenerTodasLasCalificaciones() {
-        return (List<Calificacion>) calificacion_repository.findAll();
+    public List<Califiacion_dto> obtenerTodasLasCalificaciones() {
+        return calificacion_repository.findAll().stream()
+                .map(calificacion -> modelMapper.map(calificacion, Califiacion_dto.class))
+                .collect(Collectors.toList());
+    }
+        // Obtener calificaciones por servicio
+    public List<Califiacion_dto> obtenerCalificacionesPorServicio(Long servicioId) {
+        return calificacion_repository.findByServicioId(servicioId).stream()
+                .map(calificacion -> modelMapper.map(calificacion, Califiacion_dto.class))
+                .collect(Collectors.toList());
+    }
+
+    public List<Califiacion_dto> obtenerCalificacionesPorCliente(Long clienteId) {
+        return calificacion_repository.findByClienteId(clienteId).stream()
+                .map(calificacion -> modelMapper.map(calificacion, Califiacion_dto.class))
+                .collect(Collectors.toList());
     }
 
     // Obtener calificación por ID
@@ -78,6 +90,15 @@ public class Calificacion_service {
             return new Califiacion_dto(calificacionActualizada.getId_calificacion(), calificacionActualizada.getEstrellas(), calificacionActualizada.getComentario());
         } else {
             throw new IllegalArgumentException("Calificación no encontrada");
+        }
+    }
+
+    private void validarCalificacion(Califiacion_dto calificacionDto) {
+        if (calificacionDto.getEstrellas() < 1 || calificacionDto.getEstrellas() > 5) {
+            throw new IllegalArgumentException("Las estrellas deben estar entre 1 y 5.");
+        }
+        if (calificacionDto.getComentario() != null && calificacionDto.getComentario().length() > 1000) {
+            throw new IllegalArgumentException("El comentario no puede exceder los 1000 caracteres.");
         }
     }
 

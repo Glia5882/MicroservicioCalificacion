@@ -7,6 +7,6 @@ import com.calificacion.microservicio.entities.Calificacion;
 
 @Repository
 public interface Calificacion_repository extends CrudRepository<Calificacion, Long> {
-
-
+    List<Calificacion> findByServicioId(Long servicioId); // Consultar calificaciones por servicio
+    List<Calificacion> findByClienteId(Long clienteId);
 }
