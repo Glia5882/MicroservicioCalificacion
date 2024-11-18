@@ -22,7 +22,7 @@ import com.calificacion.microservicio.service.Calificacion_service;
 
 @RestController
 @CrossOrigin
-@RequestMapping(value = "/api/v1/calificacion", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/calificacion")
 public class Calificacion_controller {
 
     @Autowired
@@ -34,62 +34,48 @@ public class Calificacion_controller {
 
     // Crear una nueva calificación
     @PostMapping
-    public ResponseEntity<?> crearCalificacion(@RequestBody Califiacion_dto calificacionDto) {
+    public ResponseEntity<Califiacion_dto> crearCalificacion(@RequestBody Califiacion_dto calificacionDto) {
         try {
             Califiacion_dto nuevaCalificacion = calificacion_service.crearCalificacion(calificacionDto);
             return new ResponseEntity<>(nuevaCalificacion, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error al crear la calificación: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     // Obtener todas las calificaciones
     @GetMapping
-    public ResponseEntity<List<Califiacion_dto>> obtenerTodasLasCalificaciones() {
-        List<Califiacion_dto> calificaciones = calificacion_service.obtenerTodasLasCalificaciones()
-                .stream()
-                .map(calificacion -> new Califiacion_dto(
-                        calificacion.getId_calificacion(),
-                        calificacion.getEstrellas(),
-                        calificacion.getComentario()))
-                .collect(Collectors.toList());
+    public ResponseEntity<List<Calificacion>> obtenerTodasLasCalificaciones() {
+        List<Calificacion> calificaciones = calificacion_service.obtenerTodasLasCalificaciones();
         return new ResponseEntity<>(calificaciones, HttpStatus.OK);
     }
 
     // Obtener calificación por ID
     @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerCalificacionPorId(@PathVariable Long id) {
+    public ResponseEntity<Calificacion> obtenerCalificacionPorId(@PathVariable Long id) {
         try {
-            Califiacion_dto calificacion = calificacion_service.obtenerCalificacionPorIdDto(id);
+            Calificacion calificacion = calificacion_service.obtenerCalificacionPorId(id);
             return new ResponseEntity<>(calificacion, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Calificación no encontrada: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     // Actualizar calificación por ID
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizarCalificacion(@PathVariable Long id, @RequestBody Califiacion_dto calificacionDto) {
+    public ResponseEntity<Califiacion_dto> actualizarCalificacion(@PathVariable Long id, @RequestBody Califiacion_dto calificacionDto) {
         try {
             Califiacion_dto calificacionActualizada = calificacion_service.actualizarCalificacion(id, calificacionDto);
             return new ResponseEntity<>(calificacionActualizada, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Error al actualizar la calificación: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     // Eliminar calificación por ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminarCalificacion(@PathVariable Long id) {
-        try {
-            calificacion_service.eliminarCalificacion(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Error al eliminar la calificación: " + e.getMessage());
-        }
+    public ResponseEntity<Void> eliminarCalificacion(@PathVariable Long id) {
+        calificacion_service.eliminarCalificacion(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
