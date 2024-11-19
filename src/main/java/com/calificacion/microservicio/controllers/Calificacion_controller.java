@@ -78,4 +78,22 @@ public class Calificacion_controller {
         calificacion_service.eliminarCalificacion(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/servicio/{idServicio}")
+    public ResponseEntity<List<Califiacion_dto>> obtenerCalificacionesPorServicio(@PathVariable Long idServicio) {
+    List<Califiacion_dto> calificaciones = calificacion_service.obtenerCalificacionesPorServicio(idServicio);
+    return ResponseEntity.ok(calificaciones);
+}
+
+
+    @GetMapping("/cliente/{id}")
+    public ResponseEntity<?> obtenerCalificacionesPorCliente(@PathVariable Long id) {
+        try {
+            List<Califiacion_dto> calificaciones = calificacion_service.obtenerCalificacionesPorCliente(id);
+            return ResponseEntity.ok(calificaciones);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
+    
 }

@@ -20,5 +20,7 @@ public class Calificacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id_calificacion;
     private int estrellas;
-    private String comentario; 
+    private String comentario;
+    private long idCliente;
+    private long idServicio;
 }

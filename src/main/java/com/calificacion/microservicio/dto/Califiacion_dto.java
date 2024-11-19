@@ -14,5 +14,7 @@ import lombok.experimental.Accessors;
 public class Califiacion_dto {
     private long id_calificacion;
     private int estrellas;
-    private String comentario; 
+    private String comentario;
+    private long idCliente;
+    private Long idServicio;
 }
