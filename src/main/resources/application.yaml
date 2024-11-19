@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: microservicio-calificacion
+  config:
+    import: configserver:http://localhost:8888
